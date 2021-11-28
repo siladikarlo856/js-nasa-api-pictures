@@ -29,8 +29,20 @@ function saveFavorite(itemUrl) {
     });
 }
 
-function updateDOM() {
-    resultsArray.forEach((result) => {
+function createDOMNodes(page) {
+    let currentArray = [];
+    switch (page) {
+        case 'results':
+            currentArray = resultsArray;
+            break;
+        case 'favorites':
+            currentArray = Object.values(favorites);
+            break; 
+        default:
+            console.log("Unknown page identifier");
+            break;
+    }
+    currentArray.forEach((result) => {
         // Card Container
         const card = document.createElement('div');
         card.classList.add('card');
@@ -78,7 +90,15 @@ function updateDOM() {
         card.append(link, body);
         imagesContainer.appendChild(card);
     });
+}
 
+function updateDOM(page) {
+    // Get Favorites from localStorage
+    if (localStorage.getItem('nasaFavorites')) {
+        favorites = JSON.parse(localStorage.getItem('nasaFavorites'));
+        console.log(favorites);
+    }
+    createDOMNodes(page);
 }
 
 // Get mages from NASA API
@@ -86,8 +106,7 @@ async function getNasaPictures() {
     try {
         const response = await fetch(apiUrl);
         resultsArray = await response.json();
-        console.log(resultsArray);
-        updateDOM();
+        updateDOM('favorites');
     } catch(error) {
         // Catch Error Here
     }
