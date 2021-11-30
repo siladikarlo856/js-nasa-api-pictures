@@ -29,6 +29,18 @@ function saveFavorite(itemUrl) {
     });
 }
 
+// Remove item from favorites
+function removeFavorite(itemUrl) {
+    // remove property from object
+    if (favorites[itemUrl]) {
+        delete favorites[itemUrl];
+        // Set Favorites in localStorage
+        localStorage.setItem('nasaFavorites', JSON.stringify(favorites));
+        updateDOM('favorites');
+    }
+}
+
+
 function createDOMNodes(page) {
     let currentArray = [];
     switch (page) {
@@ -67,9 +79,15 @@ function createDOMNodes(page) {
         // Add to Favorites
         const addToFavorites = document.createElement('p');
         addToFavorites.classList.add('clickable');
-        addToFavorites.textContent = 'Add to Favorites';
-        addToFavorites.url = result.url;
-        addToFavorites.setAttribute('onclick', `saveFavorite('${result.url}')`);
+        if (page === 'results') {
+            addToFavorites.textContent = 'Add to Favorites';
+            addToFavorites.url = result.url;
+            addToFavorites.setAttribute('onclick', `saveFavorite('${result.url}')`);
+        } else {
+            addToFavorites.textContent = 'Remove Favorite';
+            addToFavorites.url = result.url;
+            addToFavorites.setAttribute('onclick', `removeFavorite('${result.url}')`);
+        }
         // Card Text Explanation
         const cardText = document.createElement('p');
         cardText.classList.add('card-text');
@@ -98,6 +116,7 @@ function updateDOM(page) {
         favorites = JSON.parse(localStorage.getItem('nasaFavorites'));
         console.log(favorites);
     }
+    imagesContainer.textContent = '';
     createDOMNodes(page);
 }
 
