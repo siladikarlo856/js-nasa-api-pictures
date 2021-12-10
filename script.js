@@ -5,12 +5,35 @@ const saveConfirmed = document.querySelector('.save-confirmed');
 const loader = document.querySelector('.loader');
 
 // NASA API
-const count = 2;
+const count = 4;
 const apiKey = 'DEMO_KEY';
 const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&count=${count}`;
 
 let resultsArray = [];
 let favorites = {};
+
+function showContent(page) {
+    window.scrollTo({
+        top: 0,
+        behavior: 'instant'
+    });
+
+    switch (page) {
+        case 'results':
+            resultsNav.classList.remove('hidden');
+            favoritesNav.classList.add('hidden');
+            break;
+        case 'favorites':
+            resultsNav.classList.add('hidden');
+            favoritesNav.classList.remove('hidden');
+            break; 
+        default:
+            console.log("Unknown page identifier");
+            break;
+    }
+
+    loader.classList.add('hidden');
+}
 
 // Add result to Favorites
 function saveFavorite(itemUrl) {
@@ -114,18 +137,21 @@ function updateDOM(page) {
     // Get Favorites from localStorage
     if (localStorage.getItem('nasaFavorites')) {
         favorites = JSON.parse(localStorage.getItem('nasaFavorites'));
-        console.log(favorites);
     }
     imagesContainer.textContent = '';
     createDOMNodes(page);
+    showContent(page);
+
 }
 
 // Get mages from NASA API
 async function getNasaPictures() {
+    // Show Loader
+    loader.classList.remove('hidden');
     try {
         const response = await fetch(apiUrl);
         resultsArray = await response.json();
-        updateDOM('favorites');
+        updateDOM('results');
     } catch(error) {
         // Catch Error Here
     }
